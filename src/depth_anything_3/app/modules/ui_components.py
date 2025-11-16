@@ -233,6 +233,8 @@ class UIComponents:
         gr.Checkbox,
         gr.Checkbox,
         gr.Checkbox,
+        gr.Checkbox,
+        gr.Checkbox,
         gr.Slider,
         gr.Slider,
         gr.Dropdown,
@@ -273,6 +275,24 @@ class UIComponents:
             show_cam = gr.Checkbox(label="Show Camera", value=True)
             filter_black_bg = gr.Checkbox(label="Filter Black Background", value=False)
             filter_white_bg = gr.Checkbox(label="Filter White Background", value=False)
+            use_gravity_alignment = gr.Checkbox(
+                label="Align Y-axis with Gravity (based on sensor data)",
+                value=False,
+                info="Align scene to physical up direction using pitch angles from EXIF metadata or camera poses"
+            )
+            show_axes = gr.Checkbox(
+                label="Show Coordinate Axes",
+                value=False,
+                info="Display X (red), Y (green=UP), Z (blue) axes for orientation reference"
+            )
+            show_camera_frame = gr.Slider(
+                minimum=-1,
+                maximum=50,
+                value=-1,
+                step=1,
+                label="Show Camera Frame Axes",
+                info="Show camera frame coordinate system for selected frame (-1 = none, 0 = first camera, etc.)"
+            )
             save_percentage = gr.Slider(
                 minimum=0,
                 maximum=100,
@@ -294,6 +314,9 @@ class UIComponents:
             show_cam,
             filter_black_bg,
             filter_white_bg,
+            use_gravity_alignment,
+            show_axes,
+            show_camera_frame,
             save_percentage,
             num_max_points,
             gs_trj_mode,

@@ -138,6 +138,9 @@ class EventHandlers:
         show_cam: bool = True,
         filter_black_bg: bool = False,
         filter_white_bg: bool = False,
+        use_gravity_alignment: bool = False,
+        show_axes: bool = False,
+        show_camera_frame: int = -1,
         process_res_method: str = "upper_bound_resize",
         selected_first_frame: str = "",
         save_percentage: float = 30.0,
@@ -215,6 +218,9 @@ class EventHandlers:
                 target_dir,
                 process_res_method=process_res_method,
                 show_camera=show_cam,
+                use_gravity_alignment=use_gravity_alignment,
+                show_axes=show_axes,
+                show_camera_frame=int(show_camera_frame),
                 selected_first_frame=selected_first_frame,
                 save_percentage=save_percentage,
                 num_max_points=int(num_max_points * 1000),  # Convert K to actual count
@@ -277,6 +283,9 @@ class EventHandlers:
         is_example: str,
         filter_black_bg: bool = False,
         filter_white_bg: bool = False,
+        use_gravity_alignment: bool = False,
+        show_axes: bool = False,
+        show_camera_frame: int = -1,
         process_res_method: str = "upper_bound_resize",
     ) -> Tuple[gr.update, str]:
         """

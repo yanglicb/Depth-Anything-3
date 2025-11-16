@@ -64,6 +64,9 @@ class ModelInference:
         target_dir: str,
         filter_black_bg: bool = False,
         filter_white_bg: bool = False,
+        use_gravity_alignment: bool = False,
+        show_axes: bool = False,
+        show_camera_frame: int = -1,
         process_res_method: str = "upper_bound_resize",
         show_camera: bool = True,
         selected_first_frame: Optional[str] = None,
@@ -163,8 +166,12 @@ class ModelInference:
         # num_max_points: int = 1_000_000,
         export_to_glb(
             prediction,
+            image_paths=image_paths,  # Pass image paths for metadata extraction
             filter_black_bg=filter_black_bg,
             filter_white_bg=filter_white_bg,
+            use_gravity_alignment=use_gravity_alignment,
+            show_axes=show_axes,
+            show_camera_frame=show_camera_frame,
             export_dir=target_dir,
             show_cameras=show_camera,
             conf_thresh_percentile=save_percentage,
