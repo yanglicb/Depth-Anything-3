@@ -236,6 +236,7 @@ class DepthAnything3App:
                             filter_white_bg,
                             use_gravity_alignment,
                             show_axes,
+                            use_z_up,
                             show_camera_frame,
                             save_percentage,
                             num_max_points,
@@ -281,6 +282,7 @@ class DepthAnything3App:
                 filter_white_bg,
                 use_gravity_alignment,
                 show_axes,
+                use_z_up,
                 show_camera_frame,
                 process_res_method_dropdown,
                 save_percentage,
@@ -328,6 +330,7 @@ class DepthAnything3App:
         filter_white_bg: gr.Checkbox,
         use_gravity_alignment: gr.Checkbox,
         show_axes: gr.Checkbox,
+        use_z_up: gr.Checkbox,
         show_camera_frame: gr.Slider,
         process_res_method_dropdown: gr.Dropdown,
         save_percentage: gr.Slider,
@@ -383,6 +386,7 @@ class DepthAnything3App:
                 filter_white_bg,
                 use_gravity_alignment,
                 show_axes,
+                use_z_up,
                 show_camera_frame,
                 process_res_method_dropdown,
                 selected_first_frame_state,
@@ -418,6 +422,7 @@ class DepthAnything3App:
             filter_white_bg,
             use_gravity_alignment,
             show_axes,
+            use_z_up,
             show_camera_frame,
             process_res_method_dropdown,
             target_dir_output,
@@ -499,6 +504,7 @@ class DepthAnything3App:
         filter_white_bg: gr.Checkbox,
         use_gravity_alignment: gr.Checkbox,
         show_axes: gr.Checkbox,
+        use_z_up: gr.Checkbox,
         show_camera_frame: gr.Slider,
         process_res_method_dropdown: gr.Dropdown,
         target_dir_output: gr.Textbox,
@@ -516,12 +522,13 @@ class DepthAnything3App:
             filter_white_bg,
             use_gravity_alignment,
             show_axes,
+            use_z_up,
             show_camera_frame,
             process_res_method_dropdown,
         ]
 
         # Set up change handlers for all visualization controls
-        for component in [show_cam, filter_black_bg, filter_white_bg, use_gravity_alignment, show_axes, show_camera_frame]:
+        for component in [show_cam, filter_black_bg, filter_white_bg, use_gravity_alignment, show_axes, use_z_up, show_camera_frame]:
             component.change(
                 fn=self.event_handlers.update_visualization,
                 inputs=viz_inputs,

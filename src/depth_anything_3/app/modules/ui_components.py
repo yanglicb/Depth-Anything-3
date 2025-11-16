@@ -285,6 +285,11 @@ class UIComponents:
                 value=False,
                 info="Display X (red), Y (green=UP), Z (blue) axes for orientation reference"
             )
+            use_z_up = gr.Checkbox(
+                label="Export with Z-up coordinate system",
+                value=False,
+                info="Use Z-up convention instead of Y-up (applies additional 90° rotation)"
+            )
             show_camera_frame = gr.Slider(
                 minimum=-1,
                 maximum=50,
@@ -316,6 +321,7 @@ class UIComponents:
             filter_white_bg,
             use_gravity_alignment,
             show_axes,
+            use_z_up,
             show_camera_frame,
             save_percentage,
             num_max_points,

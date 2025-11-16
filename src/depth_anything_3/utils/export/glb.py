@@ -361,6 +361,7 @@ def export_to_glb(
     filter_white_bg: bool = False,
     use_gravity_alignment: bool = False,
     show_axes: bool = False,
+    use_z_up: bool = False,
     show_camera_frame: int = -1,
     conf_thresh_percentile: float = 40.0,
     ensure_thresh_percentile: float = 90.0,
@@ -519,6 +520,20 @@ def export_to_glb(
             gravity_transform = _compute_gravity_alignment_from_camera_vectors(
                 prediction.extrinsics
             )
+    
+    # Apply Z-up transformation if requested (rotate 90° around X-axis to convert Y-up to Z-up)
+    if use_z_up:
+        logger.info("Applying Z-up transformation (90° rotation around X-axis)")
+        # Rotation matrix for 90° around X-axis: rotates Y to Z, Z to -Y
+        R_z_up = np.array([
+            [1, 0, 0],
+            [0, 0, -1],
+            [0, 1, 0]
+        ])
+        z_up_transform = np.eye(4)
+        z_up_transform[:3, :3] = R_z_up
+        # Apply Z-up after gravity alignment
+        gravity_transform = z_up_transform @ gravity_transform
     
     A = _compute_alignment_transform_first_cam_glTF_center_by_points(
         prediction.extrinsics[0], points, gravity_transform

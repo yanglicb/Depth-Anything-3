@@ -140,6 +140,7 @@ class EventHandlers:
         filter_white_bg: bool = False,
         use_gravity_alignment: bool = False,
         show_axes: bool = False,
+        use_z_up: bool = False,
         show_camera_frame: int = -1,
         process_res_method: str = "upper_bound_resize",
         selected_first_frame: str = "",
@@ -220,6 +221,7 @@ class EventHandlers:
                 show_camera=show_cam,
                 use_gravity_alignment=use_gravity_alignment,
                 show_axes=show_axes,
+                use_z_up=use_z_up,
                 show_camera_frame=int(show_camera_frame),
                 selected_first_frame=selected_first_frame,
                 save_percentage=save_percentage,
@@ -285,6 +287,7 @@ class EventHandlers:
         filter_white_bg: bool = False,
         use_gravity_alignment: bool = False,
         show_axes: bool = False,
+        use_z_up: bool = False,
         show_camera_frame: int = -1,
         process_res_method: str = "upper_bound_resize",
     ) -> Tuple[gr.update, str]:
