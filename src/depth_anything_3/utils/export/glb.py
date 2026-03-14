@@ -196,22 +196,25 @@ def _compute_simple_pitch_alignment(
 
 # Import metadata utilities from FastVGGT
 # These functions handle pitch angle extraction from EXIF and gravity alignment computation
-try:
-    import sys
-    # Add FastVGGT to path if not already there
-    fastvggt_path = os.path.join(os.path.dirname(__file__), "../../../../../FastVGGT")
-    if os.path.exists(fastvggt_path) and fastvggt_path not in sys.path:
-        sys.path.insert(0, os.path.abspath(fastvggt_path))
-    
-    from metadata_util import (
-        get_pitch_angles,
-        compute_gravity_alignment_from_pitch_and_poses,
-    )
-    METADATA_UTILS_AVAILABLE = True
-except ImportError as e:
-    logger.warning(f"Could not import metadata_util from FastVGGT: {e}")
-    logger.warning("Gravity alignment will use camera pose analysis only (no EXIF pitch data)")
-    METADATA_UTILS_AVAILABLE = False
+# Commented out since FastVGGT is not available in this project
+# The code uses built-in EXIF extraction and gravity alignment instead
+METADATA_UTILS_AVAILABLE = False
+# try:
+#     import sys
+#     # Add FastVGGT to path if not already there
+#     fastvggt_path = os.path.join(os.path.dirname(__file__), "../../../../../FastVGGT")
+#     if os.path.exists(fastvggt_path) and fastvggt_path not in sys.path:
+#         sys.path.insert(0, os.path.abspath(fastvggt_path))
+#     
+#     from metadata_util import (
+#         get_pitch_angles,
+#         compute_gravity_alignment_from_pitch_and_poses,
+#     )
+#     METADATA_UTILS_AVAILABLE = True
+# except ImportError as e:
+#     logger.warning(f"Could not import metadata_util from FastVGGT: {e}")
+#     logger.warning("Gravity alignment will use camera pose analysis only (no EXIF pitch data)")
+#     METADATA_UTILS_AVAILABLE = False
 
 
 def _compute_gravity_alignment_from_camera_vectors(
@@ -588,10 +591,20 @@ def export_to_glb(
     out_path = os.path.join(export_dir, "scene.glb")
     scene.export(out_path)
 
+    # Export PLY directly using Open3D to preserve colors
+    if points.shape[0] > 0:
+        import open3d as o3d
+        ply_path = os.path.join(export_dir, "scene.ply")
+        print(f"Directly exporting PLY to {ply_path}")
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(points.astype(np.float64))
+        pcd.colors = o3d.utility.Vector3dVector(colors.astype(np.float64) / 255.0)
+        o3d.io.write_point_cloud(ply_path, pcd)
+
     if export_depth_vis:
         export_to_depth_vis(prediction, export_dir)
         os.system(f"cp -r {export_dir}/depth_vis/0000.jpg {export_dir}/scene.jpg")
-    return out_path
+    return out_path, A
 
 
 # =========================

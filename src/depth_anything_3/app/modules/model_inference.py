@@ -69,6 +69,7 @@ class ModelInference:
         use_z_up: bool = False,
         show_camera_frame: int = -1,
         process_res_method: str = "upper_bound_resize",
+        process_res: int = 504,
         show_camera: bool = True,
         selected_first_frame: Optional[str] = None,
         save_percentage: float = 30.0,
@@ -162,10 +163,11 @@ class ModelInference:
         print(f"Running inference with method: {actual_method}")
         with torch.no_grad():
             prediction = self.model.inference(
-                image_paths, export_dir=None, process_res_method=actual_method, infer_gs=infer_gs
+                image_paths, export_dir=None, process_res_method=actual_method,
+                process_res=process_res, infer_gs=infer_gs
             )
         # num_max_points: int = 1_000_000,
-        export_to_glb(
+        _, transform_A = export_to_glb(
             prediction,
             image_paths=image_paths,  # Pass image paths for metadata extraction
             filter_black_bg=filter_black_bg,
@@ -179,6 +181,7 @@ class ModelInference:
             conf_thresh_percentile=save_percentage,
             num_max_points=int(num_max_points),
         )
+        prediction.alignment_transform = transform_A
 
         # export to gs video if needed
         if infer_gs:
@@ -236,6 +239,8 @@ class ModelInference:
                 save_dict["extrinsics"] = prediction.extrinsics
             if prediction.intrinsics is not None:
                 save_dict["intrinsics"] = prediction.intrinsics
+            if hasattr(prediction, "alignment_transform"):
+                save_dict["alignment_transform"] = prediction.alignment_transform
 
             # Save to file
             np.savez_compressed(output_file, **save_dict)

@@ -38,6 +38,7 @@ class ReconstructionPipeline:
         save_percentage: float = 30.0,
         use_gravity_alignment: bool = True,
         use_z_up: bool = True,
+        process_res: int = 504,
     ) -> Dict[str, str]:
         """
         Run the reconstruction pipeline.
@@ -78,10 +79,11 @@ class ReconstructionPipeline:
         with torch.no_grad():
             prediction, processed_data = self.model_inference.run_inference(
                 target_dir=target_dir,
-                process_res_method="upper_bound_resize", # Default low_res
+                process_res_method="upper_bound_resize",
+                process_res=process_res,
                 save_percentage=save_percentage,
                 num_max_points=num_max_points,
-                infer_gs=False, # We don't need GS for SpatialLM
+                infer_gs=False,
                 use_gravity_alignment=use_gravity_alignment,
                 use_z_up=use_z_up,
             )
@@ -93,55 +95,11 @@ class ReconstructionPipeline:
             results["glb"] = os.path.join(target_dir, "scene.glb")
 
         if save_ply:
-            if "glb" in results and os.path.exists(results["glb"]):
-                # Create PLY by converting GLB to ensure consistency
-                print("Converting GLB to PLY for consistency...")
-                ply_path = os.path.join(target_dir, "scene.ply")
-                
-                try:
-                    # Load GLB using trimesh
-                    scene = trimesh.load(results["glb"], force='scene')
-                    
-                    # Merge scene geometry into a single point cloud or mesh
-                    # If it's a point cloud GLB, scene.geometry will contain PointCloud objects
-                    
-                    # Collect all points and colors
-                    all_points = []
-                    all_colors = []
-                    
-                    for geom in scene.geometry.values():
-                        if hasattr(geom, 'vertices'):
-                            points = geom.vertices
-                            colors = None
-                            if hasattr(geom, 'visual') and hasattr(geom.visual, 'vertex_colors'):
-                                colors = geom.visual.vertex_colors
-                            elif hasattr(geom, 'visual') and hasattr(geom.visual, 'face_colors'):
-                                # Fallback? GLB export from depth anything is likely points
-                                pass
-                                
-                            all_points.append(points)
-                            if colors is not None:
-                                all_colors.append(colors)
-                                
-                    if all_points:
-                        combined_points = np.vstack(all_points)
-                        combined_colors = np.vstack(all_colors) if all_colors else None
-                        
-                        pcd = o3d.geometry.PointCloud()
-                        pcd.points = o3d.utility.Vector3dVector(combined_points)
-                        if combined_colors is not None:
-                             # Trimesh colors are typically uint8 (0-255)
-                             # Open3D expects float (0-1)
-                             pcd.colors = o3d.utility.Vector3dVector(combined_colors[:, :3] / 255.0)
-                        
-                        o3d.io.write_point_cloud(ply_path, pcd)
-                        results["ply"] = ply_path
-                        print(f"Saved PLY to {ply_path}")
-                    else:
-                        print("Warning: No geometry found in GLB to convert to PLY")
-                except Exception as e:
-                    print(f"Error converting GLB to PLY: {e}")
+            ply_path = os.path.join(target_dir, "scene.ply")
+            if os.path.exists(ply_path):
+                results["ply"] = ply_path
+                print(f"PLY found at {ply_path}")
             else:
-                print("Cannot save PLY: GLB file missing (export to GLB required for PLY generation)")
+                print("Cannot save PLY: PLY file missing after inference")
 
         return results
