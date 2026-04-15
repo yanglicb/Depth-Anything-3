@@ -4,6 +4,7 @@ import numpy as np
 import open3d as o3d
 from typing import Optional, Tuple, List, Dict, Any
 from depth_anything_3.app.modules.model_inference import ModelInference
+from depth_anything_3.utils.export.gs import export_to_gs_ply
 from depth_anything_3.utils.export.glb import (
     export_to_glb, 
     _depths_to_world_points_with_colors, 
@@ -34,6 +35,7 @@ class ReconstructionPipeline:
         image_paths: List[str],
         save_ply: bool = True,
         save_glb: bool = True,
+        save_gs: bool = False,
         num_max_points: int = 1_000_000,
         save_percentage: float = 30.0,
         use_gravity_alignment: bool = True,
@@ -83,15 +85,15 @@ class ReconstructionPipeline:
                 process_res=process_res,
                 save_percentage=save_percentage,
                 num_max_points=num_max_points,
-                infer_gs=False,
+                infer_gs=save_gs,
+                export_gs_video=False,   # skip gsplat video; we export PLY instead
                 use_gravity_alignment=use_gravity_alignment,
                 use_z_up=use_z_up,
             )
 
         results = {}
-        
+
         if save_glb:
-            # run_inference already calls export_to_glb and saves to scene.glb
             results["glb"] = os.path.join(target_dir, "scene.glb")
 
         if save_ply:
@@ -101,5 +103,17 @@ class ReconstructionPipeline:
                 print(f"PLY found at {ply_path}")
             else:
                 print("Cannot save PLY: PLY file missing after inference")
+
+        if save_gs:
+            if prediction.gaussians is not None:
+                export_to_gs_ply(prediction, target_dir)
+                gs_path = os.path.join(target_dir, "gs_ply", "0000.ply")
+                if os.path.exists(gs_path):
+                    results["gs_ply"] = gs_path
+                    print(f"GS PLY saved at {gs_path}")
+                else:
+                    print("GS PLY export ran but file not found")
+            else:
+                print("save_gs=True but prediction.gaussians is None — skipping GS export")
 
         return results

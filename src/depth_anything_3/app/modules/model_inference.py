@@ -77,6 +77,7 @@ class ModelInference:
         infer_gs: bool = False,
         gs_trj_mode: str = "extend",
         gs_video_quality: str = "high",
+        export_gs_video: bool = True,
     ) -> Tuple[Any, Dict[int, Dict[str, Any]]]:
         """
         Run DepthAnything3 model inference on images.
@@ -184,7 +185,7 @@ class ModelInference:
         prediction.alignment_transform = transform_A
 
         # export to gs video if needed
-        if infer_gs:
+        if infer_gs and export_gs_video:
             mode_mapping = {"extend": "extend", "smooth": "interpolate_smooth"}
             print(f"GS mode: {gs_trj_mode}; Backend mode: {mode_mapping[gs_trj_mode]}")
             export_to_gs_video(
